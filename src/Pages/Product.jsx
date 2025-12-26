@@ -1,10 +1,7 @@
 
-
-
-
-
 import React, { useState } from "react";
 import { Search, Eye, Pencil, Trash2, Plus, ChevronDown, X } from "lucide-react";
+import img from '../../public/Group 7.png';
 
 const Product = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,7 +12,7 @@ const Product = () => {
     category: "Heater",
     price: "₹3,499",
     stock: "45 units",
-    image: "../../public/Group 7.png",
+    image: img,
   });
 
   return (
