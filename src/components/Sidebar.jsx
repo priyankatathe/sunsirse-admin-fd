@@ -58,10 +58,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center gap-4 rounded-xl px-6 py-2 transition-all duration-200
-          ${isActive ? "bg-white text-[#1C58F2]" : "hover:bg-white hover:text-black"}`}
+          ${isActive ? "bg-white text-black" : "hover:bg-white hover:text-black"}`}
                             >
                                 <span className="text-3xl">{item.icon}</span>
-                                {!collapsed && <span className="text-[20px] font-medium">{item.name}</span>}
+                                {!collapsed && <span className="text-[15px] font-medium">{item.name}</span>}
                             </Link>
                         );
                     })}
