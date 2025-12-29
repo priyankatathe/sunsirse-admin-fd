@@ -114,9 +114,16 @@ const TotalUser = () => {
                   <div className="text-xs text-gray-400">{customer.email}</div>
                 </div>
               </div>
-              <button className="text-gray-900 hover:text-gray-600 transition-colors">
+              <button
+                onClick={() => {
+                  setSelectedUser(customer);
+                  setIsModalOpen(true);
+                }}
+                className="text-gray-900 hover:text-gray-600 transition-colors"
+              >
                 <Eye className="w-5 h-5" />
               </button>
+
             </div>
             <div className="text-sm text-[#191A1A] mb-1"><span className="font-semibold">Location:</span> {customer.location}</div>
             <div className="text-sm text-[#191A1A] mb-1"><span className="font-semibold">Contact:</span> {customer.contact}</div>
