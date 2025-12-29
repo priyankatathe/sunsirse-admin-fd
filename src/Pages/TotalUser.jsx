@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, Eye } from 'lucide-react';
 
 const TotalUser = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   const customers = [
     {
       id: 1,
@@ -77,9 +80,16 @@ const TotalUser = () => {
                 <td className="px-6 py-4 text-sm text-[#191A1A]">{customer.joined}</td>
                 <td className="px-6 py-4 text-sm font-semibold text-[#177A3A]">{customer.spent}</td>
                 <td className="px-6 py-4 text-center">
-                  <button className="text-gray-900 hover:text-gray-600 transition-colors">
+                  <button
+                    onClick={() => {
+                      setSelectedUser(customer);
+                      setIsModalOpen(true);
+                    }}
+                    className="text-gray-900 hover:text-gray-600 transition-colors"
+                  >
                     <Eye className="w-5 h-5 inline-block" />
                   </button>
+
                 </td>
               </tr>
             ))}
@@ -116,6 +126,92 @@ const TotalUser = () => {
           </div>
         ))}
       </div>
+
+      {/* modal view detail */}
+      {isModalOpen && selectedUser && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-white w-full max-w-lg rounded-[28px] p-6 shadow-2xl animate-in fade-in zoom-in duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-gray-900">User Details</h2>
+              {/* <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button> */}
+            </div>
+
+            {/* Profile */}
+            <div className="flex items-center gap-4 mb-6 bg-gray-100 rounded-2xl p-4">
+              <div className="h-14 w-14 bg-black text-white rounded-full flex items-center justify-center font-bold text-lg">
+                {selectedUser.initials}
+              </div>
+              <div>
+                <p className="text-base font-semibold text-gray-900">
+                  {selectedUser.name}
+                </p>
+                <p className="text-sm text-gray-500">{selectedUser.email}</p>
+              </div>
+            </div>
+
+            {/* Details Grid */}
+            <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+              <div className="bg-gray-100 rounded-xl p-3">
+                <p className="text-gray-500 text-xs">Location</p>
+                <p className="font-semibold text-gray-900">
+                  {selectedUser.location}
+                </p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-3">
+                <p className="text-gray-500 text-xs">Contact</p>
+                <p className="font-semibold text-gray-900">
+                  {selectedUser.contact}
+                </p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-3">
+                <p className="text-gray-500 text-xs">Orders</p>
+                <p className="font-semibold text-gray-900">
+                  {selectedUser.orders}
+                </p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-3">
+                <p className="text-gray-500 text-xs">Joined</p>
+                <p className="font-semibold text-gray-900">
+                  {selectedUser.joined}
+                </p>
+              </div>
+            </div>
+
+            {/* Total Spent */}
+            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6">
+              <p className="text-xs text-green-700">Total Spent</p>
+              <p className="text-lg font-bold text-green-700">
+                {selectedUser.spent}
+              </p>
+            </div>
+
+            {/* Action */}
+            {/* <button
+              onClick={() => setIsModalOpen(false)}
+              className="w-[40%] bg-black text-white py-3 rounded-2xl font-semibold hover:bg-gray-900 transition"
+            >
+              Close
+            </button> */}
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };

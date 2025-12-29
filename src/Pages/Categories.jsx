@@ -82,15 +82,18 @@ const Categories = () => {
 
       {/* --- Add New Category Modal --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4
+         backdrop-blur-sm"
+              onClick={() => setIsModalOpen(false)}
+         >
           <div className="bg-white rounded-[2rem] w-full max-w-md p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200">
             {/* Close Button */}
-            <button
+            {/* <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X size={20} />
-            </button>
+            </button> */}
 
             <h2 className="text-xl font-bold text-gray-900 mb-8">Add New Category</h2>
 

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Eye, Download, ChevronDown, X, MapPin } from 'lucide-react';
+import img from '../../public/Group 7.png';
+import { Search, Eye, Download, ChevronDown, X, MapPin, ChevronDownIcon } from 'lucide-react';
+import { IoLocationSharp } from 'react-icons/io5';
 
 const OrderManagement = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -136,69 +138,118 @@ const OrderManagement = () => {
                 ))}
             </div>
 
-            {/* Modal */}
+            {/* update status Modal */}
             {isModalOpen && selectedOrder && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm overflow-auto">
-                    <div className="bg-white w-full max-w-md sm:max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Order Details - {selectedOrder.id}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                <X size={24} />
-                            </button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+                    onClick={() => setIsModalOpen(false)}
+                >
+                    <div className="bg-white  w-full max-w-xl md:max-w-xl  rounded-[28px] p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-bold text-gray-900">
+                                Order Details - {selectedOrder.id}
+                            </h2>
+
+                            <div className="flex items-center gap-3 ">
+                                <div className="relative inline-block">
+                                    <select className="appearance-none bg-gray-100 text-sm font-medium px-5 py-2 pr-10 rounded-full outline-none cursor-pointer focus:ring-2 focus:ring-gray-300">
+                                        <option>Delivered</option>
+                                        <option>Pending</option>
+                                        <option>Cancelled</option>
+                                    </select>
+                                    <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600 pointer-events-none" />
+                                </div>
+                               
+                            </div>
                         </div>
 
-                        <div className="space-y-5">
-                            {/* Customer Info */}
-                            <section>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">Customer Information</h3>
-                                <div className="bg-gray-50 rounded-2xl p-4 flex items-center gap-3">
-                                    <div className="h-12 w-12 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                        {selectedOrder.name.split(' ').map(n => n[0]).join('')}
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-gray-900">{selectedOrder.name}</div>
-                                        <div className="text-sm text-gray-500">{selectedOrder.email}</div>
-                                        <div className="text-sm text-gray-500">{selectedOrder.contact}</div>
-                                    </div>
-                                </div>
-                            </section>
+                        {/* Customer Info */}
+                        <section className="mb-5">
+                            <h3 className="text-lg font-bold text-[#000000] mb-2">
+                                Customer Information
+                            </h3>
 
-                            {/* Shipping Address */}
-                            <section>
-                                <div className="bg-gray-50 rounded-2xl p-4">
-                                    <div className="flex items-center gap-2 font-bold text-gray-900 mb-1">
-                                        <MapPin size={18} /> Shipping Address
-                                    </div>
-                                    <p className="text-sm text-gray-600 leading-relaxed pl-6">
-                                        {selectedOrder.address || "123 MG Road, Bangalore, Karnataka 560001"}
+                            <div className="bg-gray-100 rounded-2xl p-4 flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-full bg-black text-white flex items-center justify-center font-semibold">
+                                    {selectedOrder.name
+                                        .split(" ")
+                                        .map((n) => n[0])
+                                        .join("")}
+                                </div>
+
+                                <div>
+                                    <p className="font-medium text-[#191A1A]">
+                                        {selectedOrder.name}
+                                    </p>
+                                    <p className="text-sm font-medium    text-[#212121BD]">
+                                        {selectedOrder.email}
+                                    </p>
+                                    <p className="text-sm font-medium  text-[#191A1A]">
+                                        {selectedOrder.contact}
                                     </p>
                                 </div>
-                            </section>
+                            </div>
+                        </section>
 
-                            {/* Product Details */}
-                            <section>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">Product Details</h3>
-                                <div className="bg-gray-50 rounded-2xl p-4 flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-16 h-12 bg-white rounded-xl overflow-hidden border border-gray-100 flex items-center justify-center p-1">
-                                            <img src="https://via.placeholder.com/50" alt="product" className="object-contain" />
-                                        </div>
-                                        <div>
-                                            <div className="text-sm font-bold text-gray-900">{selectedOrder.product || "SmartTemp WiFi Enabled Geyser"}</div>
-                                            <div className="text-sm text-gray-500">Quantity: 1</div>
-                                        </div>
-                                    </div>
-                                    <div className="font-bold text-gray-900">{selectedOrder.productPrice || "₹10,399"}</div>
+                        {/* Shipping Address */}
+                        <section className="mb-5">
+                            <div className="bg-gray-100 rounded-2xl p-4">
+                                <div className="flex items-center gap-2 font-medium text-#000000 mb-1">
+                                    <IoLocationSharp size={16} />
+                                    Shipping Address
                                 </div>
-                            </section>
 
-                            <button className="w-full bg-[#1a1a1a] text-white py-3 rounded-2xl font-bold text-lg hover:bg-black transition-all mt-4">
+                                <p className="text-sm text-[#000000] font-medium leading-relaxed pl-6">
+                                    {selectedOrder.address ||
+                                        "123 MG Road, Bangalore, Karnataka 560001"}
+                                </p>
+                            </div>
+                        </section>
+
+                        {/* Product Details */}
+                        <section className="mb-6">
+                            <h3 className="text-lg font-bold text-[#000000] mb-2">
+                                Product Details
+                            </h3>
+
+                            <div className="bg-gray-100 rounded-2xl p-4 flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-16 h-12 bg-white rounded-xl border flex items-center justify-center">
+                                        <img
+                                            src={img}
+                                            alt="product"
+                                            className="object-contain"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm font-semibold text-[#000000]">
+                                            {selectedOrder.product ||
+                                                "SmartTemp WiFi Enabled Geyser 15L"}
+                                        </p>
+                                        <p className="text-xs mt-3 font-semibold text-[#000000]">
+                                            Quantity: 1
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <p className="font-semibold text-gray-900">
+                                    {selectedOrder.productPrice || "₹10,399"}
+                                </p>
+                            </div>
+                        </section>
+
+                        {/* Action Button */}
+                        <div className='text-center'>
+                            <button className="w-[30%]  bg-black text-white py-3 rounded-2xl font-semibold hover:bg-gray-900 transition">
                                 Update Status
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
         </div>
     );
 };

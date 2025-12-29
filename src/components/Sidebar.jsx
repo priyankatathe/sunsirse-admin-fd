@@ -68,10 +68,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 </nav>
 
                 {/* User Info at Bottom */}
-                <div className="absolute bottom-2 left-0 mb-5 w-full flex items-center gap-3 px-6">
+                <div
+                    className="
+    absolute bottom-2 left-0 mb-5 w-full flex items-center gap-3 px-6
+    md:absolute md:bottom-2
+    max-md:relative max-md:mt-60 max-md:p-3
+  "
+                >
                     <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
                         <FaUserAlt className="text-black text-lg" />
                     </div>
+
                     {!collapsed && (
                         <div className="text-white">
                             <p className="text-sm font-medium">Sarah Chen</p>
@@ -79,6 +86,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         </div>
                     )}
                 </div>
+
             </div>
 
 

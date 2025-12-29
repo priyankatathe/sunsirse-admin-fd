@@ -5,6 +5,12 @@ import img from '../../public/Group 7.png';
 
 const Product = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [viewProduct, setViewProduct] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+
+
 
   const products = Array(6).fill({
     name: "EcoHeat Pro 2000W Room Heater",
@@ -59,14 +65,15 @@ const Product = () => {
 
       {/* ================= TABLE (DESKTOP/TABLET) ================= */}
       <div className="hidden md:block overflow-x-auto rounded-2xl border shadow-sm">
-        <table className="w-full">
+        <table className="w-full  table-fixed">
           <thead>
             <tr className="bg-[#1a1a1a] text-white">
-              <th className="px-6 py-4 text-sm text-left">Product</th>
-              <th className="px-6 py-4 text-sm text-center">Category</th>
-              <th className="px-6 py-4 text-sm text-center">Price</th>
-              <th className="px-6 py-4 text-sm text-center">Stock</th>
-              <th className="px-6 py-4 text-sm text-center">Action</th>
+              <th className="px-4 py-4 text-sm text-left w-[30%]">Product</th>
+              <th className="px-4 py-4 text-sm text-center w-[15%]">Category</th>
+              <th className="px-4 py-4 text-sm text-center w-[15%]">Price</th>
+              <th className="px-4 py-4 text-sm text-center w-[15%]">Stock</th>
+              <th className="px-4 py-4 text-sm text-center w-[20%]">Action</th>
+
             </tr>
           </thead>
 
@@ -105,8 +112,24 @@ const Product = () => {
 
                 <td className="px-6 py-4">
                   <div className="flex justify-center gap-4">
-                    <Eye size={18} />
-                    <Pencil size={18} />
+                    <Eye
+                      size={18}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setViewProduct(item);
+                        setIsViewOpen(true);
+                      }}
+                    />
+
+                    <Pencil
+                      size={18}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setEditProduct(item);
+                        setIsEditOpen(true);
+                      }}
+                    />
+
                     <Trash2 size={18} className="text-red-500" />
                   </div>
                 </td>
@@ -144,8 +167,24 @@ const Product = () => {
             </div>
 
             <div className="flex justify-end gap-4 mt-4">
-              <Eye size={18} />
-              <Pencil size={18} />
+              <Eye
+                size={18}
+                className="cursor-pointer"
+                onClick={() => {
+                  setViewProduct(item);
+                  setIsViewOpen(true);
+                }}
+              />
+
+              <Pencil
+                size={18}
+                className="cursor-pointer"
+                onClick={() => {
+                  setEditProduct(item);
+                  setIsEditOpen(true);
+                }}
+              />
+
               <Trash2 size={18} className="text-red-500" />
             </div>
           </div>
@@ -153,12 +192,14 @@ const Product = () => {
       </div>
 
       {/* --- Add Product Modal --- */}
-   {isModalOpen && (
-  <div className="fixed inset-0 p-5 bg-black/50 z-50 flex items-end md:items-center justify-center">
-    
-    {/* Modal Box */}
-    <div
-      className="
+      {isModalOpen && (
+        <div className="fixed inset-0 p-5 bg-black/50 z-50 flex items-end md:items-center justify-center"
+              onClick={() => setIsModalOpen(false)}
+        >
+
+          {/* Modal Box */}
+          <div
+            className="
         bg-white w-full md:max-w-2xl
         rounded-3xl md:rounded-3xl
         p-5 md:p-8
@@ -167,131 +208,339 @@ const Product = () => {
         overflow-y-auto
         animate-slideUp
       "
-    >
-      {/* Close Button */}
-      <button
-        onClick={() => setIsModalOpen(false)}
-        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-      >
-        <X size={24} />
-      </button>
+          >
+            {/* Close Button */}
+            {/* <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <X size={24} />
+            </button> */}
 
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-        
-        {/* Select Category */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            Select Category
-          </label>
-          <div className="relative">
-            <select className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm appearance-none">
-              <option>Select</option>
-              <option>Heater</option>
-            </select>
-            <ChevronDown
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-              size={18}
-            />
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+
+              {/* Select Category */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Select Category
+                </label>
+                <div className="relative">
+                  <select className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm appearance-none">
+                    <option>Select</option>
+                    <option>Heater</option>
+                  </select>
+                  <ChevronDown
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    size={18}
+                  />
+                </div>
+              </div>
+
+              {/* Product Name */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Product Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Name"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Quantity */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Quantity
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Quantity"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Upload Images */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Upload Images
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* How To Use */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  How To Use
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Key Highlights */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Key Highlights
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Price
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Price"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Submit */}
+              <div className="md:col-span-2 flex justify-center pt-2 pb-4">
+                <button
+                  type="button"
+                  className="bg-[#1a1a1a] text-white px-10 py-3 rounded-xl font-medium hover:bg-black w-full md:w-auto"
+                >
+                  Add Product
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      )}
 
-        {/* Product Name */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            Product Name
-          </label>
-          <input
-            type="text"
-            placeholder="Enter Name"
-            className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
-          />
+      {/* view product detail modal */}
+      {isViewOpen && viewProduct && (
+        <div className="fixed inset-0 p-5 bg-black/50 z-50 flex items-center md:items-center justify-center"
+              onClick={() => setIsViewOpen(false)}
+        >
+
+          <div className="
+      bg-white w-full md:max-w-xl
+      rounded-3xl
+      p-5 md:p-8
+      relative
+      max-h-[90vh]
+      overflow-y-auto
+      animate-slideUp
+    ">
+
+            {/* Close */}
+            {/* <button
+              onClick={() => setIsViewOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <X size={24} />
+            </button> */}
+
+            {/* Product Info */}
+            <div className="flex gap-4 mb-6">
+              <img
+                src={viewProduct.image}
+                className="w-20 h-20 rounded-xl"
+                alt=""
+              />
+              <div>
+                <p className="text-lg font-semibold">{viewProduct.name}</p>
+                <p className="text-sm text-gray-400">{viewProduct.warranty}</p>
+                <span className="inline-block mt-2 px-4 py-1 text-xs rounded-full bg-[#D9D9D970] border">
+                  {viewProduct.category}
+                </span>
+              </div>
+            </div>
+
+            {/* Details */}
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-gray-400">Price</p>
+                <p className="font-bold">{viewProduct.price}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Stock</p>
+                <p>{viewProduct.stock}</p>
+              </div>
+            </div>
+
+          </div>
         </div>
+      )}
 
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            Description
-          </label>
-          <input
-            type="text"
-            placeholder="Enter"
-            className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
-          />
-        </div>
 
-        {/* Quantity */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            Quantity
-          </label>
-          <input
-            type="text"
-            placeholder="Enter Quantity"
-            className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
-          />
-        </div>
+      {/* edit modal */}
+      {isEditOpen && editProduct && (
+        <div className="fixed inset-0 p-5 bg-black/50 z-50 flex items-end md:items-center justify-center"
+          onClick={() => setIsEditOpen(false)}
+        >
 
-        {/* Upload Images */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            Upload Images
-          </label>
-          <input
-            type="text"
-            placeholder="Enter"
-            className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
-          />
-        </div>
+          {/* Modal Box */}
+          <div
+            className="
+        bg-white w-full md:max-w-2xl
+        rounded-3xl
+        p-5 md:p-8
+        relative
+        max-h-[90vh]
+        overflow-y-auto
+        animate-slideUp
+      "
 
-        {/* How To Use */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            How To Use
-          </label>
-          <input
-            type="text"
-            placeholder="Enter"
-            className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
-          />
-        </div>
-
-        {/* Key Highlights */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            Key Highlights
-          </label>
-          <input
-            type="text"
-            placeholder="Enter"
-            className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
-          />
-        </div>
-
-        {/* Price */}
-        <div>
-          <label className="block text-sm font-semibold mb-2">
-            Price
-          </label>
-          <input
-            type="text"
-            placeholder="Enter Price"
-            className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
-          />
-        </div>
-
-        {/* Submit */}
-        <div className="md:col-span-2 flex justify-center pt-2 pb-4">
-          <button
-            type="button"
-            className="bg-[#1a1a1a] text-white px-10 py-3 rounded-xl font-medium hover:bg-black w-full md:w-auto"
           >
-            Add Product
-          </button>
+            {/* Close Button */}
+            {/* <button
+              onClick={() => setIsEditOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <X size={24} />
+            </button> */}
+
+            <h2 className="text-xl text-center p-3 font-semibold mb-4">Edit Product</h2>
+
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Select Category
+                </label>
+                <div className="relative">
+                  <select
+                    defaultValue={editProduct.category}
+                    className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm appearance-none"
+                  >
+                    <option>Heater</option>
+                  </select>
+                  <ChevronDown
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    size={18}
+                  />
+                </div>
+              </div>
+
+              {/* Product Name */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Product Name
+                </label>
+                <input
+                  type="text"
+                  defaultValue={editProduct.name}
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  defaultValue="Energy efficient heater"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Quantity */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Quantity
+                </label>
+                <input
+                  type="text"
+                  defaultValue={editProduct.stock}
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Upload Image */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Upload Images
+                </label>
+                <input
+                  type="text"
+                  defaultValue="image.png"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* How To Use */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  How To Use
+                </label>
+                <input
+                  type="text"
+                  defaultValue="Plug & Play"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Key Highlights */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Key Highlights
+                </label>
+                <input
+                  type="text"
+                  defaultValue="Low power consumption"
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Price
+                </label>
+                <input
+                  type="text"
+                  defaultValue={editProduct.price}
+                  className="w-full bg-[#f3f4f6] rounded-xl px-4 py-3 text-sm"
+                />
+              </div>
+
+              {/* Submit */}
+              <div className="md:col-span-2 flex justify-center pt-2 pb-4">
+                <button
+                  type="button"
+                  className="bg-yellow-400 text-white px-10 py-3 rounded-xl font-medium hover:bg-yellow-300 w-full md:w-auto"
+                >
+                  Update Product
+                </button>
+              </div>
+
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
+
 
     </div>
   );
