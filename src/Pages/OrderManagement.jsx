@@ -140,115 +140,121 @@ const OrderManagement = () => {
 
             {/* update status Modal */}
             {isModalOpen && selectedOrder && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-3 sm:px-4"
                     onClick={() => setIsModalOpen(false)}
                 >
-                    <div className="bg-white  w-full max-w-xl md:max-w-xl  rounded-[28px] p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+                    <div
+                        className="bg-white w-full max-w-full sm:max-w-lg md:max-w-xl
+                 rounded-[24px] sm:rounded-[28px]
+                 px-4 sm:px-6 py-5 shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
 
                         {/* Header */}
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold text-gray-900">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                            <h2 className="text-base sm:text-lg font-bold text-gray-900">
                                 Order Details - {selectedOrder.id}
                             </h2>
 
-                            <div className="flex items-center gap-3 ">
-                                <div className="relative inline-block">
-                                    <select className="appearance-none bg-gray-100 text-sm font-medium px-5 py-2 pr-10 rounded-full outline-none cursor-pointer focus:ring-2 focus:ring-gray-300">
-                                        <option>Delivered</option>
-                                        <option>Pending</option>
-                                        <option>Cancelled</option>
-                                    </select>
-                                    <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600 pointer-events-none" />
-                                </div>
-                               
+                            <div className="relative w-fit">
+                                <select
+                                    className="appearance-none bg-gray-100 text-sm font-medium
+                       px-5 py-2 pr-10 rounded-full outline-none cursor-pointer
+                       focus:ring-2 focus:ring-gray-300"
+                                >
+                                    <option>Delivered</option>
+                                    <option>Pending</option>
+                                    <option>Cancelled</option>
+                                </select>
+
+                                <ChevronDownIcon
+                                    className="absolute right-3 top-1/2 -translate-y-1/2
+                       w-5 h-5 text-gray-600 pointer-events-none"
+                                />
                             </div>
                         </div>
 
                         {/* Customer Info */}
-                        <section className="mb-5">
-                            <h3 className="text-lg font-bold text-[#000000] mb-2">
+                        <section className="mb-4">
+                            <h3 className="text-base sm:text-lg font-bold mb-2">
                                 Customer Information
                             </h3>
 
                             <div className="bg-gray-100 rounded-2xl p-4 flex items-center gap-4">
-                                <div className="h-12 w-12 rounded-full bg-black text-white flex items-center justify-center font-semibold">
+                                <div className="h-11 w-11 rounded-full bg-black text-white flex items-center justify-center font-semibold">
                                     {selectedOrder.name
                                         .split(" ")
                                         .map((n) => n[0])
                                         .join("")}
                                 </div>
 
-                                <div>
-                                    <p className="font-medium text-[#191A1A]">
-                                        {selectedOrder.name}
-                                    </p>
-                                    <p className="text-sm font-medium    text-[#212121BD]">
-                                        {selectedOrder.email}
-                                    </p>
-                                    <p className="text-sm font-medium  text-[#191A1A]">
-                                        {selectedOrder.contact}
-                                    </p>
+                                <div className="text-sm">
+                                    <p className="font-medium">{selectedOrder.name}</p>
+                                    <p className="text-gray-600">{selectedOrder.email}</p>
+                                    <p>{selectedOrder.contact}</p>
                                 </div>
                             </div>
                         </section>
 
-                        {/* Shipping Address */}
-                        <section className="mb-5">
+                        {/* Shipping */}
+                        <section className="mb-4">
                             <div className="bg-gray-100 rounded-2xl p-4">
-                                <div className="flex items-center gap-2 font-medium text-#000000 mb-1">
+                                <div className="flex items-center gap-2 font-medium mb-1">
                                     <IoLocationSharp size={16} />
                                     Shipping Address
                                 </div>
 
-                                <p className="text-sm text-[#000000] font-medium leading-relaxed pl-6">
+                                <p className="text-sm pl-6">
                                     {selectedOrder.address ||
                                         "123 MG Road, Bangalore, Karnataka 560001"}
                                 </p>
                             </div>
                         </section>
 
-                        {/* Product Details */}
-                        <section className="mb-6">
-                            <h3 className="text-lg font-bold text-[#000000] mb-2">
+                        {/* Product */}
+                        <section className="mb-5">
+                            <h3 className="text-base sm:text-lg font-bold mb-2">
                                 Product Details
                             </h3>
 
-                            <div className="bg-gray-100 rounded-2xl p-4 flex justify-between items-center">
+                            <div className="bg-gray-100 rounded-2xl p-4 flex justify-between items-center gap-3">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-16 h-12 bg-white rounded-xl border flex items-center justify-center">
-                                        <img
-                                            src={img}
-                                            alt="product"
-                                            className="object-contain"
-                                        />
+                                    <div className="w-14 h-12 bg-white rounded-xl border flex items-center justify-center">
+                                        <img src={img} alt="product" className="object-contain" />
                                     </div>
 
-                                    <div>
-                                        <p className="text-sm font-semibold text-[#000000]">
+                                    <div className="text-sm">
+                                        <p className="font-semibold">
                                             {selectedOrder.product ||
                                                 "SmartTemp WiFi Enabled Geyser 15L"}
                                         </p>
-                                        <p className="text-xs mt-3 font-semibold text-[#000000]">
+                                        <p className="text-xs mt-1 font-semibold">
                                             Quantity: 1
                                         </p>
                                     </div>
                                 </div>
 
-                                <p className="font-semibold text-gray-900">
+                                <p className="font-semibold">
                                     {selectedOrder.productPrice || "₹10,399"}
                                 </p>
                             </div>
                         </section>
 
-                        {/* Action Button */}
-                        <div className='text-center'>
-                            <button className="w-[30%]  bg-black text-white py-3 rounded-2xl font-semibold hover:bg-gray-900 transition">
+                        {/* Button */}
+                        <div className="text-center">
+                            <button
+                                className="w-full sm:w-[40%] bg-black text-white py-3
+                     rounded-2xl font-semibold hover:bg-gray-900 transition"
+                            >
                                 Update Status
                             </button>
                         </div>
+
                     </div>
                 </div>
             )}
+
 
         </div>
     );
