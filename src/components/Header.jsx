@@ -16,6 +16,8 @@ const Header = ({ toggleSidebar }) => {
         "/order-management": "Order Management",
         "/categories": "Categories",
         "/transactions": "Transactions",
+        "/coupens": "Coupens",
+        "/message": "Messages",
     };
     return (
         <header className="bg-[#FFFFF8]  p-4 flex items-center justify-between">

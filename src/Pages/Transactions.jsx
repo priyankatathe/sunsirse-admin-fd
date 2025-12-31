@@ -1,20 +1,56 @@
 import React from 'react';
 import { Search, Filter } from 'lucide-react';
+import { useGetTransactionQuery } from '../redux/api/orderApi';
+const TableSkeleton = () => (
+  <>
+    {[...Array(6)].map((_, i) => (
+      <tr key={i} className="animate-pulse">
+        <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-24"></div></td>
+        <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-32"></div></td>
+        <td className="px-4 py-3 text-center"><div className="h-4 bg-gray-200 rounded w-20 mx-auto"></div></td>
+        <td className="px-4 py-3 text-center"><div className="h-4 bg-gray-200 rounded w-24 mx-auto"></div></td>
+        <td className="px-4 py-3 text-center"><div className="h-4 bg-gray-200 rounded w-16 mx-auto"></div></td>
+        <td className="px-4 py-3 text-center"><div className="h-6 bg-gray-200 rounded-full w-20 mx-auto"></div></td>
+      </tr>
+    ))}
+  </>
+);
+
+const MobileSkeleton = () => (
+  <>
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className="border rounded-2xl p-4 animate-pulse">
+        <div className="flex justify-between mb-3">
+          <div className="h-4 bg-gray-200 rounded w-24"></div>
+          <div className="h-5 bg-gray-200 rounded-full w-16"></div>
+        </div>
+        <div className="space-y-2">
+          <div className="h-3 bg-gray-200 rounded w-32"></div>
+          <div className="h-3 bg-gray-200 rounded w-40"></div>
+          <div className="h-3 bg-gray-200 rounded w-28"></div>
+        </div>
+      </div>
+    ))}
+  </>
+);
 
 const Transactions = () => {
-  const transactions = Array(15).fill({
-    id: "TR-23456",
-    name: "john doe",
-    email: "john@gmail.com",
-    date: "20/09/2025",
-    contact: "8585 555 555",
-    amount: "₹800",
-    method: "UPI",
-    status: "Paid"
-  });
+  const { data, isLoading } = useGetTransactionQuery();
+
+  const transactions = data?.data?.map((tr) => ({
+    id: tr._id,
+    name: tr.user_id?.name || "Anonymous",
+    email: tr.user_id?.email || "-",
+    date: new Date(tr.createdAt).toLocaleDateString("en-GB"),
+    contact: tr.user_id?.contact || "-",
+    amount: `₹${tr.amount}`,
+    // method: tr.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online',
+    status: tr.payment_status?.charAt(0).toUpperCase() + tr.payment_status?.slice(1)
+  }));
+
 
   return (
-    <div className="px-4 py-6 bg-white font-manrope">
+    <div className="px-4 bg-white font-manrope">
       <p className="text-lg font-semibold text-[#212121BD] mb-6">
         Manage all Transactions
       </p>
@@ -42,62 +78,71 @@ const Transactions = () => {
       </div>
 
       {/* Desktop Table - Hidden on Mobile */}
-      <div className="hidden md:block border border-gray-100 rounded-2xl shadow-sm overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-[#1a1a1a] text-white sticky top-0 z-20">
-            <tr>
-              <th className="px-4 py-3 text-xs text-left whitespace-nowrap">Transaction ID</th>
-              <th className="px-4 py-3 text-xs text-left whitespace-nowrap">Customer</th>
-              <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Date</th>
-              <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Contact</th>
-              <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Amount</th>
-              <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Method</th>
-              <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Status</th>
-            </tr>
-          </thead>
-          <tbody className="table-row-group max-h-[430px] overflow-y-auto no-scrollbar bg-white">
-            {transactions.map((tr, i) => (
-              <tr key={i} className="table-row hover:bg-gray-50">
-                <td className="px-4 py-3 text-sm text-gray-600">{tr.id}</td>
-                <td className="px-4 py-3">
-                  <div className="text-sm font-semibold">{tr.name}</div>
-                  <div className="text-xs text-gray-400">{tr.email}</div>
-                </td>
-                <td className="px-4 py-3 text-sm text-center">{tr.date}</td>
-                <td className="px-4 py-3 text-sm text-center">{tr.contact}</td>
-                <td className="px-4 py-3 text-sm font-semibold text-center">{tr.amount}</td>
-                <td className="px-4 py-3 text-sm text-center">{tr.method}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold">
-                    {tr.status}
-                  </span>
-                </td>
+      <div className="hidden md:block border border-gray-100 rounded-2xl shadow-sm">
+        <div className="max-h-[500px] rounded-xl overflow-y-auto no-scrollbar">
+          <table className="w-full overflow-x-auto">
+            <thead className="bg-[#1a1a1a] text-white sticky top-0 z-20">
+              <tr>
+                <th className="px-4 py-3 text-xs text-left whitespace-nowrap">Transaction ID</th>
+                <th className="px-4 py-3 text-xs text-left whitespace-nowrap">Customer</th>
+                <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Date</th>
+                <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Contact</th>
+                <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Amount</th>
+                {/* <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Method</th> */}
+                <th className="px-4 py-3 text-xs text-center whitespace-nowrap">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white">
+              {isLoading ? (
+                <TableSkeleton />
+              ) : (
+                transactions?.map((tr, i) => (
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm font-medium">{tr.id}</td>
+                    <td className="px-4 py-3">{tr.name}</td>
+                    <td className="px-4 py-3 text-center">{tr.date}</td>
+                    <td className="px-4 py-3 text-center">{tr.contact}</td>
+                    <td className="px-4 py-3 text-center">{tr.amount}</td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${tr.status === "Paid"
+                        ? "bg-[#04C53B2B] text-[#2C7E00]"
+                        : "bg-red-100 text-red-600"
+                        }`}>
+                        {tr.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+
+          </table>
+        </div>
       </div>
 
       {/* Mobile Cards - Hidden on Desktop */}
       <div className="md:hidden flex flex-col gap-4">
-        {transactions.map((tr, i) => (
-          <div key={i} className="border border-gray-100 rounded-2xl p-4 shadow-sm bg-white">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-semibold">{tr.name}</span>
-              <span className="bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full text-xs font-bold">
-                {tr.status}
-              </span>
+        {isLoading ? (
+          <MobileSkeleton />
+        ) : (
+          transactions?.map((tr, i) => (
+            <div key={i} className="border border-gray-100 rounded-2xl p-4 shadow-sm bg-white">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-semibold">{tr.name}</span>
+                <span className={`px-2 py-1 rounded-full text-xs font-bold ${tr.status === "Paid" ? "bg-emerald-100 text-emerald-600" : "bg-red-100 text-red-600"}`}>
+                  {tr.status}
+                </span>
+              </div>
+              <div className="flex flex-wrap text-sm gap-2">
+                <div><strong>ID:</strong> {tr.id}</div>
+                <div><strong>Date:</strong> {tr.date}</div>
+                <div><strong>Contact:</strong> {tr.contact}</div>
+                <div><strong>Amount:</strong> {tr.amount}</div>
+                {/* <div><strong>Method:</strong> {tr.method}</div> */}
+              </div>
             </div>
-            <div className="text-xs text-gray-400 mb-2">{tr.email}</div>
-            <div className="flex flex-wrap text-sm gap-2">
-              <div><strong>ID:</strong> {tr.id}</div>
-              <div><strong>Date:</strong> {tr.date}</div>
-              <div><strong>Contact:</strong> {tr.contact}</div>
-              <div><strong>Amount:</strong> {tr.amount}</div>
-              <div><strong>Method:</strong> {tr.method}</div>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

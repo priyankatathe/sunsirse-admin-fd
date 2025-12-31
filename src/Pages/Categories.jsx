@@ -1,135 +1,263 @@
-import React, { useState } from 'react';
-import { Pencil, Trash2, Plus, X } from 'lucide-react';
-import bgimg from '../../public/1 (2).png';
-import img1 from '../../public/1 (1).png';
-import img2 from '../../public/1 (3).png';
+import React, { useState } from "react";
+import { Pencil, Trash2, Plus } from "lucide-react";
+import bgimg from "../../public/1 (2).png";
+import {
+  useAddCategoriesMutation,
+  useDeleteCategoriesMutation,
+  useEditCategoriesMutation,
+  useGetCategoriesQuery,
+} from "../redux/api/categoriesApi";
+import { useForm } from "react-hook-form";
 
+/* ---------------- Skeleton ---------------- */
+const SkeletonCard = () => (
+  <div className="bg-gray-50 rounded-xl border border-gray-100 shadow-sm overflow-hidden animate-pulse">
+    <div className="relative h-48 w-full bg-gray-200 mb-4"></div>
+    <div className="px-2 space-y-3">
+      <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div className="flex gap-3 p-2 mt-2">
+        <div className="flex-1 h-10 bg-gray-200 rounded-xl"></div>
+        <div className="flex-1 h-10 bg-gray-200 rounded-xl"></div>
+      </div>
+    </div>
+  </div>
+);
+
+/* ---------------- Component ---------------- */
 const Categories = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data, isLoading } = useGetCategoriesQuery();
+  const [addCategories] = useAddCategoriesMutation();
+  const [EditCategories] = useEditCategoriesMutation();
+  const [deleteCategories] = useDeleteCategoriesMutation();
 
-  const categories = [
-    {
-      id: 1, name: "Room Heaters", items: 3,
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  /* ---------- react-hook-form ---------- */
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+
+  /* ---------- ADD ---------- */
+  const onAddSubmit = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("image", data.image[0]);
+      await addCategories(formData).unwrap();
+      setIsModalOpen(false);
+      reset();
+    } catch (error) {
+      console.error("Add error:", error);
+    }
+  };
+
+  /* ---------- EDIT ---------- */
+  const handleEditClick = (cat) => {
+    setSelectedCategory(cat);
+    setValue("name", cat.name);
+    setValue("image", null);
+    setIsEditModalOpen(true);
+  };
+
+  const onEditSubmit = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+
+      if (data.image && data.image.length > 0) {
+        formData.append("image", data.image[0]); // ✅
+      }
+
+      await EditCategories({
+        id: selectedCategory.id,
+        data: formData,
+      }).unwrap();
+
+      setIsEditModalOpen(false);
+      reset();
+    } catch (error) {
+      console.error("Edit error:", error);
+    }
+  };
+
+
+  /* ---------- DELETE ---------- */
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this category?");
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteCategories(id).unwrap();
+      alert("Category deleted successfully ✅");
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete category ❌");
+    }
+  };
+
+
+  /* ---------- DATA ---------- */
+  const categories =
+    data?.data?.map((cat) => ({
+      id: cat._id,
+      name: cat.name,
       bgImg: bgimg,
-      fgImg: img2
-    },
-    {
-      id: 2, name: "Room Heaters", items: 3,
-      bgImg: bgimg,
-      fgImg: img1
-    },
-  ];
+      fgImg: cat.image,
+    })) || [];
 
   return (
-    <div className="px-4 bg-white  font-manrope">
-      {/* Top Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          {/* <h1 className="text-3xl font-bold text-gray-900">Categories</h1> */}
-          <p className="text-lg font-semibold text-[#212121BD]">Manage all Categories</p>
-        </div>
-        {/* Updated Button to open modal */}
+    <div className="px-4 bg-white font-manrope">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <p className="text-lg font-semibold text-[#212121BD]">
+          Manage all Categories
+        </p>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center mt-2 gap-2 bg-[#1a1a1a] text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-black transition-all shadow-sm"
+          className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl"
         >
-          <Plus size={18} />
-          Add Category
+          <Plus size={18} /> Add Category
         </button>
       </div>
 
-      {/* Responsive Grid System */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {categories.map((cat) => (
-          <div key={cat.id} className="bg-gray-50 rounded-xl  border border-gray-100 shadow-sm overflow-hidden">
-            <div className="relative h-48 w-full bg-white  flex items-center justify-center mb-4 overflow-hidden">
-              {/* Background Image */}
-              <img
-                src={cat.bgImg}
-                alt={`${cat.name} background`}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-
-              {/* Foreground Image */}
-              <img
-                src={cat.fgImg}
-                alt={`${cat.name} foreground`}
-                className="relative mt-6 max-h-32 object-contain z-10"
-              />
-            </div>
-
-            <div className="px-2">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{cat.name}</h3>
-              <div className="inline-block px-4 py-1.5 border border-gray-300 rounded-full text-xs font-semibold text-gray-700 bg-gray-100/50 mb-6">
-                {cat.items} Items
-              </div>
-
-              <div className="flex gap-3 p-2 mt-2">
-                <button className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-900 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm">
-                  <Pencil size={16} />
-                  Edit
-                </button>
-                <button className="flex-1 flex items-center justify-center gap-2 bg-[#ff1a1a] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-red-700 transition-colors shadow-sm">
-                  <Trash2 size={16} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-
-      </div>
-
-      {/* --- Add New Category Modal --- */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4
-         backdrop-blur-sm"
-              onClick={() => setIsModalOpen(false)}
-         >
-          <div className="bg-white rounded-[2rem] w-full max-w-md p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200">
-            {/* Close Button */}
-            {/* <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+      {/* Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+          : categories.map((cat) => (
+            <div
+              key={cat.id}
+              className="bg-gray-50 rounded-xl border shadow-sm"
             >
-              <X size={20} />
-            </button> */}
-
-            <h2 className="text-xl font-bold text-gray-900 mb-8">Add New Category</h2>
-
-            <form className="space-y-6">
-              {/* Category Name */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Category Name</label>
-                <input
-                  type="text"
-                  placeholder="Enter"
-                  className="w-full bg-[#f8f9fa] border-none rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-gray-200 outline-none placeholder:text-gray-400"
+              <div className="relative h-48 flex items-center justify-center">
+                <img
+                  src={cat.bgImg}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <img
+                  src={cat.fgImg}
+                  className="relative max-h-32 object-contain"
                 />
               </div>
 
-              {/* Category Image */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Category Image</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Upload"
-                    className="w-full bg-[#f8f9fa] border-none rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-gray-200 outline-none placeholder:text-gray-400 cursor-pointer"
-                  />
+              <div className="p-3">
+                <h3 className="font-bold">{cat.name}</h3>
+
+                <div className="flex gap-3 mt-3">
+                  <button
+                    onClick={() => handleEditClick(cat)}
+                    className="flex-1 border rounded-xl py-2 flex justify-center gap-2"
+                  >
+                    <Pencil size={16} /> Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(cat.id)}
+                    className="flex-1 bg-red-600 text-white rounded-xl py-2 flex justify-center gap-2"
+                  >
+                    <Trash2 size={16} /> Delete
+                  </button>
                 </div>
               </div>
+            </div>
+          ))}
+      </div>
 
-              {/* Submit Button */}
-              <div className="pt-4">
-                <button
-                  type="button"
-                  className="w-full bg-[#1a1a1a] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <Plus size={18} />
-                  Add Category
-                </button>
+      {/* ---------------- Add Modal ---------------- */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 flex justify-center items-center"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-8 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-6">Add Category</h2>
+
+            <form onSubmit={handleSubmit(onAddSubmit)} className="space-y-5">
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register("image", {
+                    required: "Image is required",
+                  })}
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+
+                {errors.image && (
+                  <p className="text-red-500 text-xs">
+                    {errors.image.message}
+                  </p>
+                )}
               </div>
+
+              <div>
+                <input
+                  type="text"
+                  placeholder="Category Name"
+                  {...register("name", {
+                    required: "Category name is required",
+                  })}
+                  className="w-full bg-gray-100 rounded-xl px-4 py-3"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <button className="w-full bg-black text-white py-3 rounded-xl">
+                Add Category
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------- Edit Modal ---------------- */}
+      {isEditModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 flex justify-center items-center"
+          onClick={() => setIsEditModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-8 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-6">Edit Category</h2>
+
+            <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-5">
+              <input
+                type="file"
+                accept="image/*"
+                {...register("image")}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+
+
+              <input
+                type="text"
+                {...register("name", {
+                  required: "Category name is required",
+                })}
+                className="w-full bg-gray-100 rounded-xl px-4 py-3"
+              />
+
+              <button className="w-full bg-black text-white py-3 rounded-xl">
+                Update Category
+              </button>
             </form>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MdDashboard, MdPeopleAlt } from "react-icons/md";
-import { RiProgress7Line, RiGraduationCapFill } from "react-icons/ri";
+import { RiProgress7Line, RiGraduationCapFill, RiMessage2Fill } from "react-icons/ri";
 import { GrDocumentVerified } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { GrUserWorker } from "react-icons/gr";
@@ -10,18 +10,23 @@ import { LuHeater } from "react-icons/lu";
 import { FaShoppingCart, FaUserAlt } from "react-icons/fa";
 import { BiCategory } from "react-icons/bi";
 import { TbMoneybag } from "react-icons/tb";
+import { HiTicket } from "react-icons/hi";
 
 const menuItems = [
+
     { name: "Dashboard", path: "/", icon: <MdDashboard />, active: true },
     { name: "Total User", path: "/total-user", icon: <MdPeopleAlt />, active: true },
     { name: "Product", path: "/product", icon: <LuHeater />, active: true },
     { name: "Order Management", path: "/order-management", icon: <FaShoppingCart />, active: true },
     { name: "Categories", path: "/categories", icon: <BiCategory />, active: true },
     { name: "Transactions", path: "/transactions", icon: <TbMoneybag />, active: true },
+    { name: "Coupens", path: "/coupens", icon: <HiTicket />, active: true },
+    { name: "Message", path: "/messages", icon: <RiMessage2Fill />, active: true },
 
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(true);
 
