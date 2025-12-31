@@ -66,21 +66,12 @@ const Dashboard = () => {
   const totalUsers = userData?.data?.length || 0;
   const totalProducts = productData?.products?.length || 0;
   const totalOrders = orderData?.data?.length || 0;
-  const totalAmount =
-    transactionData?.data?.reduce(
-      (sum, t) => sum + Number(t.amount || 0),
-      0
-    ) || 0;
+ 
 
-  const paidAmount =
+  const totalRevenue =
     transactionData?.data
       ?.filter((t) => t.payment_status === "paid")
       ?.reduce((sum, t) => sum + Number(t.amount || 0), 0) || 0;
-
- const revenuePercent =
-  totalAmount > 0
-    ? ((paidAmount / totalAmount) * 100).toFixed(1)
-    : 0;
 
   const stats = [
     {
@@ -97,7 +88,7 @@ const Dashboard = () => {
     },
     {
       title: "Revenue",
-      value: `${revenuePercent}%`,
+      value: `₹${totalRevenue.toLocaleString()}`,
       icon: TbMoneybag,
       trend: "12.5",
     },
