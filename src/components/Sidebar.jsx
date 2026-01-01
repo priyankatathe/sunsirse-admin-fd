@@ -47,7 +47,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           />
         </div>
 
-        <hr className="border-t border-gray-700/90 my-4 w-full" />
+        <hr className="border-t border-gray-700/90 my-4  w-full" />
 
         {/* Menu Items */}
         <nav className="flex-1 flex flex-col gap-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
@@ -85,7 +85,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Collapse/Expand Arrow */}
       <div
-        className={`fixed top-16 -ml-3 bg-[#F3AF1C] p-1 rounded-full cursor-pointer
+        className={`fixed top-16 -ml-3 lg:mt-5 bg-[#F3AF1C] p-1 rounded-full cursor-pointer
           z-50 transition-all duration-300
           ${isOpen ? "block" : "hidden"} md:block
         `}
