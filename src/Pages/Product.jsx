@@ -419,7 +419,7 @@ const Product = () => {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="px-7 py-2 bg-[#D9D9D970] border rounded-full text-xs">
-                        {item.category?.name || item.category || "Fan"}
+                        {item.category?.name || item.category || ""}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center font-bold">
@@ -463,7 +463,7 @@ const Product = () => {
         {isLoading ? (
           <ProductMobileSkeleton />
         ) : (
-          products.map((item) => (
+          filteredProducts.map((item) => (
             <div key={item._id} className="border rounded-xl p-4 shadow-sm">
               <div className="flex gap-3">
                 <img
@@ -479,7 +479,7 @@ const Product = () => {
 
               <div className="grid grid-cols-2 gap-y-2 mt-3 text-sm">
                 <span className="text-gray-500">Category</span>
-                <span>{item.category?.name || item.category || "Fan"}</span>
+                <span>{item.category?.name || item.category || ""}</span>
 
                 <span className="text-gray-500">Price</span>
                 <span className="font-bold">₹{item.price || 0}</span>

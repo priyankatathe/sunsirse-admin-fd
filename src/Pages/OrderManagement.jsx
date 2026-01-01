@@ -79,11 +79,10 @@ const OrderManagement = () => {
         contact: item.user_id?.contact || '-',
         date: new Date(item.createdAt).toLocaleDateString(),
 
-        // 🔑 REAL VALUES (filter ke liye)
-        paymentMethod: item.paymentMethod,     // cod | online
-        paymentStatus: item.payment_status,     // paid | cod
+        //  REAL VALUES (filter ke liye)
+        paymentMethod: item.paymentMethod,
+        paymentStatus: item.payment_status,
 
-        // 👀 DISPLAY VALUES (UI ke liye)
         paymentLabel: item.paymentMethod === 'cod'
             ? 'Cash on Delivery'
             : 'Online',
@@ -99,14 +98,20 @@ const OrderManagement = () => {
             paymentFilter === 'All' ||
             order.paymentMethod === paymentFilter;
 
-
         const statusMatch =
             statusFilter === 'All' ||
             order.paymentStatus === statusFilter;
 
-        return paymentMatch && statusMatch;
-    });
+        const searchMatch =
+            !searchTerm ||
+            order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.products.some(prod =>
+                prod.product_id?.productname.toLowerCase().includes(searchTerm.toLowerCase())
+            );
 
+        return paymentMatch && statusMatch && searchMatch;
+
+    });
 
     const handleStatusChange = async (id) => {
         console.log("id", id)
@@ -117,6 +122,48 @@ const OrderManagement = () => {
         }
     }
 
+    const handleCSVDownload = () => {
+        if (!filteredOrders.length) return;
+
+        const headers = [
+            "Order ID",
+            "Customer",
+            "Contact",
+            "Amount",
+            "Payment Method",
+            "Payment Status",
+            "Date",
+            "Address",
+        ];
+
+        const rows = filteredOrders.map(order => [
+            `"${order.id}"`,
+            `"${order.name}"`,
+            `="${order.contact}"`,  // contact as text
+            `="${order.amount.replace(/,/g, '')}"`,  // amount as text with ₹
+            `"${order.paymentLabel}"`,
+            `"${order.paymentStatus}"`,
+            `"${order.date}"`,
+            `"${order.address || '-'}"`,
+        ]);
+
+        // Combine rows
+        const csvContent =
+            headers.join(",") +
+            "\n" +
+            rows.map(row => row.join(",")).join("\n");
+
+        // ✅ Add UTF-8 BOM at the start
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Orders-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="px-4 bg-white font-manrope">
             {/* Header */}
@@ -124,7 +171,6 @@ const OrderManagement = () => {
                 <p className="text-lg font-semibold text-[#212121BD]">Manage Your Orders</p>
             </div>
 
-            {/* Toolbar */}
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 {/* Search */}
@@ -171,9 +217,13 @@ const OrderManagement = () => {
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                     </div>
 
-                    <button className="flex items-center gap-2 bg-[#1a1a1a] text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-black transition-all">
-                        <Download size={18} /> Export
+                    <button
+                        onClick={handleCSVDownload}
+                        className="flex items-center gap-2 bg-[#1a1a1a] text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-black transition-all"
+                    >
+                        <Download size={18} /> Export CSV
                     </button>
+
                 </div>
             </div>
 
@@ -264,7 +314,7 @@ const OrderManagement = () => {
                             </div>
                         </div>
                     ))
-  )}
+                )}
             </div>
 
             {/* Modal */}
@@ -283,16 +333,7 @@ const OrderManagement = () => {
                                 Order Details - {selectedOrder.id}
                             </h2>
 
-                            {/* <div className="relative w-fit">
-                                <select
-                                    className="appearance-none bg-gray-100 text-sm font-medium px-5 py-2 pr-10 rounded-full outline-none cursor-pointer focus:ring-2 focus:ring-gray-300"
-                                >
-                                    <option>Delivered</option>
-                                    <option>Pending</option>
-                                    <option>Cancelled</option>
-                                </select>
-                                <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 pointer-events-none" />
-                            </div> */}
+                          
                         </div>
 
                         {/* Customer Info */}
@@ -351,14 +392,6 @@ const OrderManagement = () => {
                             ))}
                         </section>
 
-
-
-                        {/* Button */}
-                        {/* <div className="text-center">
-                            <button className="w-full sm:w-[40%] bg-black text-white py-3 rounded-2xl font-semibold hover:bg-gray-900 transition">
-                                Update Status
-                            </button>
-                        </div> */}
                     </div>
                 </div>
             )}

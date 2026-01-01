@@ -27,23 +27,15 @@ const SkeletonCard = () => (
 /* ---------------- Component ---------------- */
 const Categories = () => {
   const { data, isLoading } = useGetCategoriesQuery();
-  const [addCategories] = useAddCategoriesMutation();
-  const [EditCategories] = useEditCategoriesMutation();
-  const [deleteCategories] = useDeleteCategoriesMutation();
+  const [addCategories, { isLoading: isAdding }] = useAddCategoriesMutation();
+  const [EditCategories, { isLoading: isEditing }] = useEditCategoriesMutation();
+  const [deleteCategories, { isLoading: isDeleting }] = useDeleteCategoriesMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  /* ---------- react-hook-form ---------- */
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm();
-
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
 
   /* ---------- ADD ---------- */
   const onAddSubmit = async (data) => {
@@ -71,16 +63,10 @@ const Categories = () => {
     try {
       const formData = new FormData();
       formData.append("name", data.name);
-
       if (data.image && data.image.length > 0) {
-        formData.append("image", data.image[0]); // ✅
+        formData.append("image", data.image[0]);
       }
-
-      await EditCategories({
-        id: selectedCategory.id,
-        data: formData,
-      }).unwrap();
-
+      await EditCategories({ id: selectedCategory.id, data: formData }).unwrap();
       setIsEditModalOpen(false);
       reset();
     } catch (error) {
@@ -88,11 +74,9 @@ const Categories = () => {
     }
   };
 
-
   /* ---------- DELETE ---------- */
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this category?");
-
     if (!confirmDelete) return;
 
     try {
@@ -104,15 +88,13 @@ const Categories = () => {
     }
   };
 
-
   /* ---------- DATA ---------- */
-  const categories =
-    data?.data?.map((cat) => ({
-      id: cat._id,
-      name: cat.name,
-      bgImg: bgimg,
-      fgImg: cat.image,
-    })) || [];
+  const categories = data?.data?.map((cat) => ({
+    id: cat._id,
+    name: cat.name,
+    bgImg: bgimg,
+    fgImg: cat.image,
+  })) || [];
 
   return (
     <div className="px-4 bg-white font-manrope">
@@ -131,38 +113,28 @@ const Categories = () => {
 
       {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isLoading
+        {(isLoading || isAdding || isEditing || isDeleting)
           ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
           : categories.map((cat) => (
-            <div
-              key={cat.id}
-              className="bg-gray-50 rounded-xl border shadow-sm"
-            >
+            <div key={cat.id} className="bg-gray-50 rounded-xl border shadow-sm">
               <div className="relative h-48 flex items-center justify-center">
-                <img
-                  src={cat.bgImg}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <img
-                  src={cat.fgImg}
-                  className="relative max-h-32 object-contain"
-                />
+                <img src={cat.bgImg} className="absolute inset-0 w-full h-full object-cover" />
+                <img src={cat.fgImg} className="relative max-h-32 object-contain" />
               </div>
-
               <div className="p-3">
                 <h3 className="font-bold">{cat.name}</h3>
-
                 <div className="flex gap-3 mt-3">
                   <button
                     onClick={() => handleEditClick(cat)}
-                    className="flex-1 border rounded-xl py-2 flex justify-center gap-2"
+                    disabled={isEditing || isAdding || isDeleting}
+                    className="flex-1 border rounded-xl py-2 flex justify-center gap-2 disabled:opacity-50"
                   >
                     <Pencil size={16} /> Edit
                   </button>
-
                   <button
                     onClick={() => handleDelete(cat.id)}
-                    className="flex-1 bg-red-600 text-white rounded-xl py-2 flex justify-center gap-2"
+                    disabled={isEditing || isAdding || isDeleting}
+                    className="flex-1 bg-red-600 text-white rounded-xl py-2 flex justify-center gap-2 disabled:opacity-50"
                   >
                     <Trash2 size={16} /> Delete
                   </button>
@@ -174,52 +146,20 @@ const Categories = () => {
 
       {/* ---------------- Add Modal ---------------- */}
       {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 flex justify-center items-center"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="bg-white rounded-2xl p-8 w-full max-w-md"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center" onClick={() => setIsModalOpen(false)}>
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-6">Add Category</h2>
-
             <form onSubmit={handleSubmit(onAddSubmit)} className="space-y-5">
               <div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  {...register("image", {
-                    required: "Image is required",
-                  })}
-                  className="w-full border rounded-lg px-3 py-2"
-                />
-
-                {errors.image && (
-                  <p className="text-red-500 text-xs">
-                    {errors.image.message}
-                  </p>
-                )}
+                <input type="file" accept="image/*" {...register("image", { required: "Image is required" })} className="w-full border rounded-lg px-3 py-2" />
+                {errors.image && <p className="text-red-500 text-xs">{errors.image.message}</p>}
               </div>
-
               <div>
-                <input
-                  type="text"
-                  placeholder="Category Name"
-                  {...register("name", {
-                    required: "Category name is required",
-                  })}
-                  className="w-full bg-gray-100 rounded-xl px-4 py-3"
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-xs">
-                    {errors.name.message}
-                  </p>
-                )}
+                <input type="text" placeholder="Category Name" {...register("name", { required: "Category name is required" })} className="w-full bg-gray-100 rounded-xl px-4 py-3" />
+                {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
               </div>
-
-              <button className="w-full bg-black text-white py-3 rounded-xl">
-                Add Category
+              <button className="w-full bg-black text-white py-3 rounded-xl" disabled={isAdding}>
+                {isAdding ? "Adding..." : "Add Category"}
               </button>
             </form>
           </div>
@@ -228,35 +168,14 @@ const Categories = () => {
 
       {/* ---------------- Edit Modal ---------------- */}
       {isEditModalOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 flex justify-center items-center"
-          onClick={() => setIsEditModalOpen(false)}
-        >
-          <div
-            className="bg-white rounded-2xl p-8 w-full max-w-md"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center" onClick={() => setIsEditModalOpen(false)}>
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-6">Edit Category</h2>
-
             <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-5">
-              <input
-                type="file"
-                accept="image/*"
-                {...register("image")}
-                className="w-full border rounded-lg px-3 py-2"
-              />
-
-
-              <input
-                type="text"
-                {...register("name", {
-                  required: "Category name is required",
-                })}
-                className="w-full bg-gray-100 rounded-xl px-4 py-3"
-              />
-
-              <button className="w-full bg-black text-white py-3 rounded-xl">
-                Update Category
+              <input type="file" accept="image/*" {...register("image")} className="w-full border rounded-lg px-3 py-2" />
+              <input type="text" {...register("name", { required: "Category name is required" })} className="w-full bg-gray-100 rounded-xl px-4 py-3" />
+              <button className="w-full bg-black text-white py-3 rounded-xl" disabled={isEditing}>
+                {isEditing ? "Updating..." : "Update Category"}
               </button>
             </form>
           </div>
@@ -265,5 +184,6 @@ const Categories = () => {
     </div>
   );
 };
+
 
 export default Categories;

@@ -5,6 +5,7 @@ import SaleByChat from "../components/SaleByChat";
 import { LuHeater } from "react-icons/lu";
 import { TbMoneybag } from "react-icons/tb";
 import { MdShoppingCart } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import {
   useGetOrderQuery,
   useGetTransactionQuery,
@@ -13,8 +14,10 @@ import { useGetProductsQuery } from "../redux/api/productApi";
 import { useGetUsersQuery } from "../redux/api/userApi";
 
 /* ================== STAT CARD ================== */
-const StatCard = ({ title, value, icon: Icon, trend }) => (
-  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+const StatCard = ({ title, value, icon: Icon, trend, onClick }) => (
+  <div
+    onClick={onClick}
+    className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
     <div className="flex justify-between items-start mb-4">
       <div>
         <p className="text-gray-600 text-sm font-medium mb-1">{title}</p>
@@ -52,6 +55,7 @@ const StatSkeleton = () => {
 
 /* ================== DASHBOARD ================== */
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { data: orderData, isLoading: orderLoading } = useGetOrderQuery();
   const { data: productData, isLoading: productLoading } =
     useGetProductsQuery();
@@ -66,7 +70,7 @@ const Dashboard = () => {
   const totalUsers = userData?.data?.length || 0;
   const totalProducts = productData?.products?.length || 0;
   const totalOrders = orderData?.data?.length || 0;
- 
+
 
   const totalRevenue =
     transactionData?.data
@@ -79,26 +83,31 @@ const Dashboard = () => {
       value: totalUsers,
       icon: Users,
       trend: "12.5",
+      path: "/total-user  ",
     },
     {
       title: "Total Products",
       value: totalProducts,
       icon: LuHeater,
       trend: "12.5",
+      path: "/product",
     },
     {
       title: "Revenue",
       value: `₹${totalRevenue.toLocaleString()}`,
       icon: TbMoneybag,
       trend: "12.5",
+      path: "/transactions",
     },
     {
       title: "Total Orders",
       value: totalOrders,
       icon: MdShoppingCart,
       trend: "12.5",
+      path: "/order-management",
     },
   ];
+
 
   return (
     <div className="px-4 font-manrope">
@@ -108,12 +117,19 @@ const Dashboard = () => {
 
       {/* ================== STATS ================== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isLoading
-          ? <StatSkeleton />
-          : stats.map((stat, index) => (
-            <StatCard key={index} {...stat} />
-          ))}
+        {isLoading ? (
+          <StatSkeleton />
+        ) : (
+          stats.map((stat, index) => (
+            <StatCard
+              key={index}
+              {...stat}
+              onClick={() => navigate(stat.path)}
+            />
+          ))
+        )}
       </div>
+
 
       {/* ================== CHARTS ================== */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">

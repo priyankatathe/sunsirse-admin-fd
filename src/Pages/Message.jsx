@@ -41,7 +41,6 @@ const Message = () => {
 
     return (
         <div className="p-4 font-manrope">
-
             {/* ================= DESKTOP TABLE ================= */}
             <div className="hidden md:block rounded-2xl mt-5 border border-gray-100 shadow-sm">
                 <div className="max-h-[500px] rounded-xl overflow-y-auto no-scrollbar">

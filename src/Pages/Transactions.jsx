@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { useGetTransactionQuery } from '../redux/api/orderApi';
 const TableSkeleton = () => (
@@ -35,7 +35,11 @@ const MobileSkeleton = () => (
 );
 
 const Transactions = () => {
-  const { data, isLoading } = useGetTransactionQuery();
+  const { data, isLoading } = useGetTransactionQuery()
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+
 
   const transactions = data?.data?.map((tr) => ({
     id: tr._id,
@@ -45,8 +49,21 @@ const Transactions = () => {
     contact: tr.user_id?.contact || "-",
     amount: `₹${tr.amount}`,
     // method: tr.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online',
-    status: tr.payment_status?.charAt(0).toUpperCase() + tr.payment_status?.slice(1)
+    status: tr.payment_status
+
   }));
+  const filteredTransactions = transactions?.filter((tr) => {
+    const searchMatch =
+      tr.name?.toLowerCase().includes(search.toLowerCase()) ||
+      tr.contact?.includes(search);
+
+    const statusMatch =
+      status === "all" || tr.status === status;
+
+    return searchMatch && statusMatch;
+  });
+
+
 
 
   return (
@@ -65,15 +82,25 @@ const Transactions = () => {
           <input
             type="text"
             placeholder="Search By Customer"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl"
           />
+
         </div>
 
         <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl">
           <Filter size={18} />
-          <select className="bg-transparent text-sm outline-none">
-            <option>All Status</option>
+          <select
+            className="bg-transparent text-sm outline-none"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="all">All Status</option>
+            <option value="paid">Paid</option>
+            <option value="cod">COD</option>
           </select>
+
         </div>
       </div>
 
@@ -96,7 +123,7 @@ const Transactions = () => {
               {isLoading ? (
                 <TableSkeleton />
               ) : (
-                transactions?.map((tr, i) => (
+                filteredTransactions?.map((tr, i) => (
                   <tr key={i} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-medium">{tr.id}</td>
                     <td className="px-4 py-3">{tr.name}</td>
@@ -104,12 +131,13 @@ const Transactions = () => {
                     <td className="px-4 py-3 text-center">{tr.contact}</td>
                     <td className="px-4 py-3 text-center">{tr.amount}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${tr.status === "Paid"
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${tr.status === "paid"
                         ? "bg-[#04C53B2B] text-[#2C7E00]"
-                        : "bg-red-100 text-red-600"
+                        : "bg-gray-200"
                         }`}>
-                        {tr.status}
+                        {tr.status.toUpperCase()}
                       </span>
+
                     </td>
                   </tr>
                 ))
@@ -125,7 +153,7 @@ const Transactions = () => {
         {isLoading ? (
           <MobileSkeleton />
         ) : (
-          transactions?.map((tr, i) => (
+          filteredTransactions?.map((tr, i) => (
             <div key={i} className="border border-gray-100 rounded-2xl p-4 shadow-sm bg-white">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-semibold">{tr.name}</span>
