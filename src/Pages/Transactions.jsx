@@ -43,7 +43,7 @@ const Transactions = () => {
 
   const transactions = data?.data?.map((tr) => ({
     id: tr._id,
-    name: tr.user_id?.name || "Anonymous",
+    name: tr.user_id?.name || "-",
     email: tr.user_id?.email || "-",
     date: new Date(tr.createdAt).toLocaleDateString("en-GB"),
     contact: tr.user_id?.contact || "-",
