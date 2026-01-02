@@ -37,7 +37,7 @@
 
 //   return (
 //     <div className="w-full bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">
-      
+
 //       <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 w-full text-left">
 //         Sales By Category
 //       </h2>
@@ -131,23 +131,28 @@ const SaleByChat = () => {
   }) => {
     if (name === 'Other') return null;
 
-    const radius = outerRadius * 1.15;
-    const x = cx + Math.abs(radius * Math.cos(-midAngle * Math.PI / 180));
-    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius * 1.25;
+
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    const isRightSide = x > cx;
 
     return (
       <text
         x={x}
         y={y}
-        fill="black"
-        textAnchor="start"
+        fill="#000"
+        textAnchor={isRightSide ? 'start' : 'end'}
         dominantBaseline="central"
-        className="text-xs sm:text-sm md:text-base font-medium"
+        className="text-xs sm:text-sm font-medium"
       >
         {`${name} ${value}%`}
       </text>
     );
   };
+
 
   return (
     <div className="w-full bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">

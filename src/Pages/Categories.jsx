@@ -172,7 +172,7 @@ const Categories = () => {
           <div className="bg-white rounded-2xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-6">Edit Category</h2>
             <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-5">
-              <input type="file" accept="image/*" {...register("image")} className="w-full border rounded-lg px-3 py-2" />
+              {/* <input type="file" accept="image/*" {...register("image")} className="w-full border rounded-lg px-3 py-2" /> */}
               <input type="text" {...register("name", { required: "Category name is required" })} className="w-full bg-gray-100 rounded-xl px-4 py-3" />
               <button className="w-full bg-black text-white py-3 rounded-xl" disabled={isEditing}>
                 {isEditing ? "Updating..." : "Update Category"}
