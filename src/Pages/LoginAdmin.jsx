@@ -22,7 +22,6 @@ const LoginAdmin = () => {
                 reset();
                 navigate('/')
                 localStorage.setItem("token", response?.token);
-                console.log("response", response);
                 return;
             }
 
