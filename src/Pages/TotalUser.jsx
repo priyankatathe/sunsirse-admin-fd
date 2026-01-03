@@ -54,8 +54,7 @@ const TotalUser = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Use API data
-  const users = data?.data || [];
+  const users = data?.data ? [...data.data].reverse() : [];
 
   // Search/filter logic
   const filteredUsers = users.filter((user) => {
@@ -65,6 +64,7 @@ const TotalUser = () => {
       (user.contact?.toLowerCase() || "").includes(term)
     );
   });
+
 
   return (
     <div className="px-4 font-manrope bg-white">
