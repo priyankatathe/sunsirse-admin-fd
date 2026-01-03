@@ -44,6 +44,7 @@ const Categories = () => {
       formData.append("name", data.name);
       formData.append("image", data.image[0]);
       await addCategories(formData).unwrap();
+      alert("Category added successfully ✅");
       setIsModalOpen(false);
       reset();
     } catch (error) {
@@ -67,6 +68,7 @@ const Categories = () => {
         formData.append("image", data.image[0]);
       }
       await EditCategories({ id: selectedCategory.id, data: formData }).unwrap();
+      alert("Category updated successfully ✅");
       setIsEditModalOpen(false);
       reset();
     } catch (error) {
@@ -150,10 +152,33 @@ const Categories = () => {
           <div className="bg-white rounded-2xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-6">Add Category</h2>
             <form onSubmit={handleSubmit(onAddSubmit)} className="space-y-5">
-              <div>
-                <input type="file" accept="image/*" {...register("image", { required: "Image is required" })} className="w-full border rounded-lg px-3 py-2" />
-                {errors.image && <p className="text-red-500 text-xs">{errors.image.message}</p>}
-              </div>
+              <label className="block mb-1 font-medium">
+                Upload Image <span className="text-red-500">*</span>
+              </label>
+
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.svg"
+                className="w-full border rounded-lg px-3 py-2"
+                {...register("image", {
+                  required: "Image is required",
+                  validate: {
+                    fileType: (files) =>
+                      files && files[0] &&
+                        ["image/jpeg", "image/png", "image/svg+xml"].includes(files[0].type)
+                        ? true
+                        : "Only JPG, PNG, or SVG files are allowed",
+                  },
+                })}
+              />
+
+              {/* Error Message */}
+              {errors.image && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.image.message}
+                </p>
+              )}
+
               <div>
                 <input type="text" placeholder="Category Name" {...register("name", { required: "Category name is required" })} className="w-full bg-gray-100 rounded-xl px-4 py-3" />
                 {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
@@ -172,7 +197,7 @@ const Categories = () => {
           <div className="bg-white rounded-2xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-6">Edit Category</h2>
             <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-5">
-              {/* <input type="file" accept="image/*" {...register("image")} className="w-full border rounded-lg px-3 py-2" /> */}
+              <input type="file" accept="image/*" {...register("image")} className="w-full border rounded-lg px-3 py-2" />
               <input type="text" {...register("name", { required: "Category name is required" })} className="w-full bg-gray-100 rounded-xl px-4 py-3" />
               <button className="w-full bg-black text-white py-3 rounded-xl" disabled={isEditing}>
                 {isEditing ? "Updating..." : "Update Category"}

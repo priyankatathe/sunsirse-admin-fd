@@ -53,7 +53,7 @@ const Coupen = () => {
                 coupen_Code: code,
                 offer,
             }).unwrap();
-
+            alert("Coupon added successfully ✅");
             setCode("");
             setOffer("");
             setIsOpen(false);
@@ -72,6 +72,7 @@ const Coupen = () => {
                 offer,
             }).unwrap();
 
+            alert("Coupon updated successfully ✅");
             setIsEditOpen(false);
             setCode("");
             setOffer("");

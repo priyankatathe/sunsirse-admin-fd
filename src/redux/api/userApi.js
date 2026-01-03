@@ -15,10 +15,17 @@ export const userApi = createApi({
                 },
                 providesTags: ["admin"]
             }),
-           
+
+            logoutAdmin: builder.mutation({
+                query: () => ({
+                    url: "/auth/logout-admin",
+                    method: "POST",
+                }),
+                invalidatesTags: ["auth"],
+            }),
 
         }
     }
 })
 
-export const { useGetUsersQuery } = userApi
+export const { useGetUsersQuery, useLogoutAdminMutation } = userApi

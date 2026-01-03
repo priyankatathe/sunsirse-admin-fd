@@ -74,7 +74,7 @@ const OrderManagement = () => {
     // Map API response to a usable format
     const orders = data?.data?.map((item) => ({
         id: item._id,
-        name: item.user_id?.name || 'Guest User',
+        name: item.user_id?.name || '-',
         email: item.user_id?.email || '-',
         contact: item.user_id?.contact || '-',
         date: new Date(item.createdAt).toLocaleDateString(),
@@ -254,11 +254,19 @@ const OrderManagement = () => {
                                         key={idx}
                                         className="hover:bg-gray-50 transition-colors whitespace-nowrap"
                                     >
-                                        <td className="px-4 py-3 text-[15px] text-[#191A1A] truncate font-medium max-w-[100px]">{order.id}</td>
+                                        <td className="px-4 py-3 text-[15px] text-[#191A1A] font-medium whitespace-nowrap">
+                                            {order.id}
+                                        </td>
+
                                         <td className="px-4 py-3 truncate max-w-[150px]">
                                             <div className="text-sm font-medium text-[#191A1A] truncate">{order.name}</div>
                                         </td>
-                                        <td className="px-4 py-3 text-sm font-medium text-[#191A1A]">{order.address || '-'}</td>
+                                        <td className="px-4 py-3 text-sm font-medium text-[#191A1A] max-w-[220px]">
+                                            <p className="line-clamp-5 break-words whitespace-normal">
+                                                {order.address || '-'}
+                                            </p>
+                                        </td>
+
                                         <td className="px-4 py-3 text-sm font-medium text-[#191A1A]">{order.date}</td>
                                         <td className="px-4 py-3 text-sm font-medium text-[#191A1A] text-center truncate max-w-[120px]">{order.contact}</td>
                                         <td className="px-4 py-3 text-center truncate max-w-[120px]">
@@ -333,7 +341,7 @@ const OrderManagement = () => {
                                 Order Details - {selectedOrder.id}
                             </h2>
 
-                          
+
                         </div>
 
                         {/* Customer Info */}
