@@ -321,13 +321,13 @@ const OrderManagement = () => {
                                     <Eye size={18} />
                                 </button>
                             </div>
-                            <div className="text-xs text-gray-500 mb-1">{order.email}</div>
+                            <div className="text-sm text-gray-500 mb-1">Adress:{order.address}</div>
                             <div className="text-sm text-gray-600 mb-1">Order ID: {order.id}</div>
                             <div className="text-sm text-gray-600 mb-1">Date: {order.date}</div>
                             <div className="text-sm text-gray-600 mb-1">Contact: {order.contact}</div>
                             <div className="flex flex-wrap items-center gap-2 mt-2">
-                                <span className="px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-gray-600 text-xs font-medium">{order.payment}</span>
-                                <span className={`px-3 py-1.5 rounded-full border text-xs font-medium ${getStatusStyle(order.status)}`}>{order.status}</span>
+                                <span className="px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-gray-600 text-xs font-medium">{order.paymentLabel}</span>
+                                <span className={`px-3 py-1.5 rounded-full border text-xs font-medium ${getStatusStyle(order.status)}`}>{order.paymentStatus}</span>
                                 <span className="px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-gray-900 text-xs font-medium">{order.amount}</span>
                             </div>
                         </div>
