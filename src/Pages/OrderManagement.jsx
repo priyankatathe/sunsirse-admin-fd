@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import img from '../../public/Group 7.png';
 import { Search, Eye, Download, ChevronDown, ChevronDownIcon } from 'lucide-react';
@@ -29,13 +30,11 @@ const OrderMobileSkeleton = () => {
                 <div className="h-4 bg-gray-200 rounded w-28"></div>
                 <div className="h-5 bg-gray-200 rounded w-6"></div>
             </div>
-
             <div className="space-y-2">
                 <div className="h-3 bg-gray-200 rounded w-40"></div>
                 <div className="h-3 bg-gray-200 rounded w-32"></div>
                 <div className="h-3 bg-gray-200 rounded w-36"></div>
             </div>
-
             <div className="flex gap-2 mt-3">
                 <div className="h-6 bg-gray-200 rounded-full w-20"></div>
                 <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -44,13 +43,11 @@ const OrderMobileSkeleton = () => {
         </div>
     ));
 };
-
 const OrderManagement = () => {
     const { data, isLoading: orderLoading } = useGetOrderQuery();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [statusdata, { isLoading }] = useEDITOrderStatusMutation();
-
     const [paymentFilter, setPaymentFilter] = useState('All'); // Payment filter state
     const [statusFilter, setStatusFilter] = useState('All'); // Status filter state
     const [searchTerm, setSearchTerm] = useState(''); // Search filter state
@@ -58,7 +55,6 @@ const OrderManagement = () => {
         setSelectedOrder(order);
         setIsModalOpen(true);
     };
-
     const getStatusStyle = (status) => {
         switch (status) {
             case 'Delivered': return 'bg-emerald-50 text-emerald-600 border-emerald-200';
@@ -70,49 +66,62 @@ const OrderManagement = () => {
             default: return 'bg-gray-50 text-gray-500 border-gray-200';
         }
     };
-
+    const extractPincode = (address = '') => {
+        const match = address.match(/\b\d{6}\b/);
+        return match ? match[0] : '-';
+    };
     // Map API response to a usable format
-    const orders = data?.data?.map((item) => ({
-        id: item._id,
-        name: item.user_id?.name || '-',
-        email: item.user_id?.email || '-',
-        contact: item.user_id?.contact || '-',
-        date: new Date(item.createdAt).toLocaleDateString(),
-
-        //  REAL VALUES (filter ke liye)
-        paymentMethod: item.paymentMethod,
-        paymentStatus: item.payment_status,
-
-        paymentLabel: item.paymentMethod === 'cod'
-            ? 'Cash on Delivery'
-            : 'Online',
-
-        amount: `₹${item.amount}`,
-        address: item.address_id?.address,
-        products: item.products,
-    })) || [];
-
+    const orders = data?.data?.map((item) => {
+        const fullAddress = item.address_id?.address || '-';
+        const separatePincode = item.address_id?.pincode; // Check for separate pincode field
+        return {
+            id: item._id,
+            // USER
+            name: item.user_id?.name || '-',
+            email: item.user_id?.email || '-',
+            contact: item.user_id?.contact || '-',
+            // DATE
+            date: new Date(item.createdAt).toLocaleDateString('en-IN'),
+            createdAt: item.createdAt,
+            // PAYMENT (REAL VALUES → filter/sort)
+            paymentMethod: item.paymentMethod, // online | cod
+            paymentStatus: item.payment_status, // paid | cod
+            // PAYMENT LABEL (UI)
+            paymentLabel:
+                item.paymentMethod === 'cod'
+                    ? 'Cash on Delivery'
+                    : 'Online Payment',
+            // AMOUNT
+            amount: Number(item.amount),
+            amountLabel: `₹${item.amount}`,
+            // ADDRESS
+            address: fullAddress,
+            pincode: separatePincode || extractPincode(fullAddress), // Prioritize separate pincode if available
+            // PRODUCTS
+            products: item.products || [],
+        };
+    }) || [];
     // Apply filters
-    const filteredOrders = orders.filter(order => {
-        const paymentMatch =
-            paymentFilter === 'All' ||
-            order.paymentMethod === paymentFilter;
-
-        const statusMatch =
-            statusFilter === 'All' ||
-            order.paymentStatus === statusFilter;
-
-        const searchMatch =
-            !searchTerm ||
-            order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.products.some(prod =>
-                prod.product_id?.productname.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-
-        return paymentMatch && statusMatch && searchMatch;
-
-    });
-
+    const filteredOrders = orders
+        .filter(order => {
+            const paymentMatch =
+                paymentFilter === 'All' ||
+                order.paymentMethod === paymentFilter;
+            const statusMatch =
+                statusFilter === 'All' ||
+                order.paymentStatus === statusFilter;
+            const searchMatch =
+                !searchTerm ||
+                order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                order.products.some(prod =>
+                    prod.product_id?.productname
+                        ?.toLowerCase()
+                        .includes(searchTerm.toLowerCase())
+                );
+            return paymentMatch && statusMatch && searchMatch;
+        })
+        // ✅ NEW ORDER FIRST
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const handleStatusChange = async (id) => {
         console.log("id", id)
         try {
@@ -121,10 +130,15 @@ const OrderManagement = () => {
             console.log(error);
         }
     }
+    const safe = (val = "") =>
+        `"${String(val)
+            .replace(/"/g, '""')     // quotes safe
+            .replace(/\r?\n|\r/g, ' ') // 🚨 REMOVE new lines
+        }"`;
+
 
     const handleCSVDownload = () => {
         if (!filteredOrders.length) return;
-
         const headers = [
             "Order ID",
             "Customer",
@@ -133,29 +147,29 @@ const OrderManagement = () => {
             "Payment Method",
             "Payment Status",
             "Date",
+            "Pincode",
             "Address",
         ];
-
         const rows = filteredOrders.map(order => [
-            `"${order.id}"`,
-            `"${order.name}"`,
-            `="${order.contact}"`,  // contact as text
-            `="${order.amount.replace(/,/g, '')}"`,  // amount as text with ₹
-            `"${order.paymentLabel}"`,
-            `"${order.paymentStatus}"`,
-            `"${order.date}"`,
-            `"${order.address || '-'}"`,
+            safe(order.id),
+            safe(order.name),
+            `="${order.contact}"`,
+            `="${order.amount}"`,
+            safe(order.paymentLabel),
+            safe(order.paymentStatus),
+            safe(order.date),     // ✅ Date first
+            safe(order.pincode),  // ✅ Pincode
+            safe(order.address),  // ✅ Address
         ]);
+
 
         // Combine rows
         const csvContent =
             headers.join(",") +
             "\n" +
             rows.map(row => row.join(",")).join("\n");
-
         // ✅ Add UTF-8 BOM at the start
         const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -163,14 +177,12 @@ const OrderManagement = () => {
         link.click();
         URL.revokeObjectURL(url);
     };
-
     return (
         <div className="px-4 bg-white font-manrope">
             {/* Header */}
             <div className="mb-6">
                 <p className="text-lg font-semibold text-[#212121BD]">Manage Your Orders</p>
             </div>
-
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 {/* Search */}
@@ -184,7 +196,6 @@ const OrderManagement = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-
                 {/* Filters + Export */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                     {/* Payment Method */}
@@ -198,10 +209,8 @@ const OrderManagement = () => {
                             <option value="cod">Cash on Delivery</option>
                             <option value="online">Online</option>
                         </select>
-
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                     </div>
-
                     {/* Status */}
                     <div className="relative flex-1 sm:flex-none w-full sm:w-auto">
                         <select
@@ -213,20 +222,16 @@ const OrderManagement = () => {
                             <option value="paid">Paid</option>
                             <option value="cod">COD</option>
                         </select>
-
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                     </div>
-
                     <button
                         onClick={handleCSVDownload}
                         className="flex items-center gap-2 bg-[#1a1a1a] text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-black transition-all"
                     >
                         <Download size={18} /> Export CSV
                     </button>
-
                 </div>
             </div>
-
             {/* Table - Desktop */}
             <div className="hidden md:block rounded-2xl border border-gray-100 shadow-sm">
                 <div className="max-h-[500px] rounded-xl overflow-y-auto no-scrollbar">
@@ -257,20 +262,28 @@ const OrderManagement = () => {
                                         <td className="px-4 py-3 text-[15px] text-[#191A1A] font-medium whitespace-nowrap">
                                             {order.id}
                                         </td>
-
                                         <td className="px-4 py-3 truncate max-w-[150px]">
                                             <div className="text-sm font-medium text-[#191A1A] truncate">{order.name}</div>
                                         </td>
                                         <td className="px-4 py-3 text-sm font-medium text-[#191A1A] max-w-[220px]">
                                             <p className="line-clamp-5 break-words whitespace-normal">
-                                                {order.address || '-'}
+                                                <span className="block font-semibold">{order.pincode || '-'}</span>
+                                                <span className="block">{order.address || '-'}</span>
                                             </p>
                                         </td>
-
                                         <td className="px-4 py-3 text-sm font-medium text-[#191A1A]">{order.date}</td>
                                         <td className="px-4 py-3 text-sm font-medium text-[#191A1A] text-center truncate max-w-[120px]">{order.contact}</td>
-                                        <td className="px-4 py-3 text-center truncate max-w-[120px]">
-                                            <span className="px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600 text-xs font-medium">
+                                        <td className="px-4 py-3 text-center max-w-[120px]">
+                                            <span className="
+    px-3 py-1.5 rounded-full
+    border border-emerald-200
+    bg-emerald-50 text-emerald-600
+    text-xs font-medium
+    inline-block
+    overflow-hidden
+    text-ellipsis
+    line-clamp-2
+  ">
                                                 {order.paymentLabel}
                                             </span>
                                         </td>
@@ -288,16 +301,13 @@ const OrderManagement = () => {
                                         {paymentFilter === "cod" && order.paymentStatus === "cod" ? <td className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-center cursor-pointer hover:underline"
                                             onClick={() => { console.log("clicked id:", order); handleStatusChange(order.id) }}
                                         >Mark as Paid</td> : null}
-
                                     </tr>
                                 ))
                             )}
-
                         </tbody>
                     </table>
                 </div>
             </div>
-
             {/* Mobile Cards - sm & md */}
             <div className="flex flex-col gap-4 md:hidden">
                 {orderLoading ? (
@@ -324,15 +334,23 @@ const OrderManagement = () => {
                     ))
                 )}
             </div>
-
             {/* Modal */}
             {isModalOpen && selectedOrder && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-3 sm:px-4"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-3 sm:px-4 "
                     onClick={() => setIsModalOpen(false)}
                 >
                     <div
-                        className="bg-white w-full max-w-full sm:max-w-lg md:max-w-xl rounded-[24px] sm:rounded-[28px] px-4 sm:px-6 py-5 shadow-2xl"
+                        className="
+    bg-white
+    w-full max-w-full sm:max-w-lg md:max-w-xl
+    rounded-[24px] sm:rounded-[28px]
+    px-4 sm:px-6 py-5
+    shadow-2xl
+    max-h-[90vh]
+    overflow-y-auto
+    no-scrollbar
+  "
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
@@ -340,10 +358,7 @@ const OrderManagement = () => {
                             <h2 className="text-base sm:text-lg font-bold text-gray-900">
                                 Order Details - {selectedOrder.id}
                             </h2>
-
-
                         </div>
-
                         {/* Customer Info */}
                         <section className="mb-4">
                             <h3 className="text-base sm:text-lg font-bold mb-2">Customer Information</h3>
@@ -357,7 +372,6 @@ const OrderManagement = () => {
                                 </div>
                             </div>
                         </section>
-
                         {/* Shipping */}
                         <section className="mb-4">
                             <div className="bg-gray-100 rounded-2xl p-4">
@@ -368,7 +382,6 @@ const OrderManagement = () => {
                                 <p className="text-sm pl-6">{selectedOrder.address || '-'}</p>
                             </div>
                         </section>
-
                         {/* Products */}
                         <section className="mb-5">
                             <h3 className="text-base sm:text-lg font-bold mb-2">Product Details</h3>
@@ -391,20 +404,17 @@ const OrderManagement = () => {
                                             <p className="text-xs mt-1 font-semibold">Quantity: {prod.quantity}</p>
                                         </div>
                                     </div>
-
                                     {/* Right: Price */}
                                     <div className="text-lg font-bold text-right">
-                                        Price :  ₹ {prod.product_id?.price}
+                                        Price : ₹ {prod.product_id?.price}
                                     </div>
                                 </div>
                             ))}
                         </section>
-
                     </div>
                 </div>
             )}
         </div>
     );
 };
-
 export default OrderManagement;
