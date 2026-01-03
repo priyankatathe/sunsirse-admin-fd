@@ -107,16 +107,7 @@ const LoginAdmin = () => {
                             )}
                         </div>
 
-                        {/* REMEMBER */}
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-5">
-                            <input
-                                type="checkbox"
-                                className="w-4 h-4 rounded border-gray-300"
-                            />
-                            Remember Me
-                        </div>
-
-                        {/* BUTTON at bottom */}
+                                               {/* BUTTON at bottom */}
                         <div className="mt-10">
                             <button
                                 type="submit"
