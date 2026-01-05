@@ -118,7 +118,7 @@ const TotalUser = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm">{user.contact}</td>
+                    <td className="px-6 py-4 text-sm">{user.contact || "-"}</td>
                     <td className="px-6 py-4 text-sm">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
